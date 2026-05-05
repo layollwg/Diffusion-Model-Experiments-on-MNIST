@@ -234,7 +234,7 @@ grids of generated digits for three selected high-performing configurations.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.65\textwidth]{figures/cosine_T200_ddpm_samples.png}
+  \includegraphics[width=0.65\textwidth]{results/cosine_T200_ddpm_samples.png}
   \caption{\textbf{cosine\_T200\_ddpm} (IS $\approx$ 8.8).
     All 10 digit classes appear with natural style variation.
     Strokes are mostly clean; minor ambiguity at complex junctions (e.g.\ ``8'', ``9'').}
@@ -243,7 +243,7 @@ grids of generated digits for three selected high-performing configurations.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.65\textwidth]{figures/cosine_T200_ddim_samples.png}
+  \includegraphics[width=0.65\textwidth]{results/cosine_T200_ddim_samples.png}
   \caption{\textbf{cosine\_T200\_ddim} (IS $\approx$ 8.8).
     Visually comparable to DDPM counterpart. Some thin strokes (``1'')
     are marginally softer, consistent with DDIM's fewer stochastic
@@ -253,7 +253,7 @@ grids of generated digits for three selected high-performing configurations.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.65\textwidth]{figures/cosine_T1000_ddim_samples.png}
+  \includegraphics[width=0.65\textwidth]{results/cosine_T1000_ddim_samples.png}
   \caption{\textbf{cosine\_T1000\_ddim} (IS $\approx$ 8.9).
     Highest visible sample quality: well-defined strokes, correct digit
     anatomy (loops in ``8'', ascenders in ``4''), and strong contrast.
@@ -314,11 +314,15 @@ same (schedule, $T$) configuration.  The key practical advantage of DDIM is
 
 \subsection{Failure Mode: Excessive Noise Injection}
 
-Figure~\ref{fig:noise_scales} illustrates four forward diffusion noise levels.
+Figure~\ref{fig:noise_scales} shows generated samples when the reverse
+process starts from Gaussian noise at six different scales.
 At scale 1.0 ($\|\mathbf{x}_T\|\approx 28$) digits are perfectly legible; at
 scale 2.0 ($\|\mathbf{x}_T\|\approx 56$) they are distorted but recognisable;
-at scale 8.0 ($\|\mathbf{x}_T\|\approx 224$) only faint structure remains; at
-scale 12.0 ($\|\mathbf{x}_T\|\approx 336$) digits are completely destroyed.
+at scale 3.0 ($\|\mathbf{x}_T\|\approx 84$) digit structure is still mostly
+intact but noticeably noisier; at scale 5.0 ($\|\mathbf{x}_T\|\approx 140$)
+only fragmented structure remains; at scale 8.0 ($\|\mathbf{x}_T\|\approx 224$)
+output is nearly random; at scale 12.0 ($\|\mathbf{x}_T\|\approx 336$) digits
+are completely destroyed.
 
 The model trained with the aggressive \texttt{linear\_T200} schedule faces a
 denoising task analogous to the high-noise cases: per-step noise increments are
@@ -347,22 +351,23 @@ demonstrating that schedule design can substitute for 5$\times$ more compute.
 \section{Visualization}
 % ═══════════════════════════════════════════════════════════════════════════
 
-\subsection{Forward Diffusion at Different Noise Scales}
+\subsection{Generated Samples at Different Latent Noise Scales}
 
-Figure~\ref{fig:noise_scales} shows the forward-process corruption at four
-noise scales, illustrating how the original MNIST digit structure is
-progressively destroyed.
+Figure~\ref{fig:noise_scales} shows generated samples when the DDIM reverse
+process is started from Gaussian noise scaled to six different magnitudes,
+illustrating how out-of-distribution starting points progressively degrade
+generation quality.
 
 \begin{figure}[H]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{figures/noise_scale_1.png}
+    \includegraphics[width=\textwidth]{results/latent_scale_1_samples.png}
     \caption{Scale = 1.0 \quad ($\|\mathbf{x}_T\|\approx 28$)}
     \label{fig:ns1}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{figures/noise_scale_2.png}
+    \includegraphics[width=\textwidth]{results/latent_scale_2_samples.png}
     \caption{Scale = 2.0 \quad ($\|\mathbf{x}_T\|\approx 56$)}
     \label{fig:ns2}
   \end{subfigure}
@@ -370,22 +375,39 @@ progressively destroyed.
   \vspace{0.6em}
 
   \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{figures/noise_scale_8.png}
+    \includegraphics[width=\textwidth]{results/latent_scale_3_samples.png}
+    \caption{Scale = 3.0 \quad ($\|\mathbf{x}_T\|\approx 84$)}
+    \label{fig:ns3}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{results/latent_scale_5_samples.png}
+    \caption{Scale = 5.0 \quad ($\|\mathbf{x}_T\|\approx 140$)}
+    \label{fig:ns5}
+  \end{subfigure}
+
+  \vspace{0.6em}
+
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{results/latent_scale_8_samples.png}
     \caption{Scale = 8.0 \quad ($\|\mathbf{x}_T\|\approx 224$)}
     \label{fig:ns8}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{figures/noise_scale_12.png}
+    \includegraphics[width=\textwidth]{results/latent_scale_12_samples.png}
     \caption{Scale = 12.0 \quad ($\|\mathbf{x}_T\|\approx 336$)}
     \label{fig:ns12}
   \end{subfigure}
 
-  \caption{Forward diffusion visualisation at four noise scales.
-    At scale 1.0 the original digits are almost unchanged; at scale 12.0
-    they are completely indistinguishable from pure Gaussian noise.
+  \caption{Generated samples at six latent noise scales.
+    At scale 1.0 ($\|\mathbf{x}_T\|\approx 28$) digits are clean and
+    recognisable; scale 3.0 introduces noticeable distortion while digit
+    structure is still largely intact; by scale 5.0 digits are heavily
+    corrupted; at scale 8.0 only faint structure remains; at scale 12.0
+    outputs are indistinguishable from pure noise.
     The aggressive per-step increments of the \texttt{linear\_T200} schedule
-    put the reverse chain in a regime resembling the scale-8 case,
+    put the reverse chain in a regime analogous to the scale-8 case,
     explaining its inferior generation quality.}
   \label{fig:noise_scales}
 \end{figure}
@@ -472,47 +494,35 @@ cosine\_T1000\_ddim & cosine/1000 & 8.9 & $-$2.05
 \appendix
 \section*{Appendix: How to Compile This Report}
 
-\subsection*{A.1 Images already in the repository}
+\subsection*{A.1 Images in the repository}
 
-\texttt{results/comparison\_chart.png} is committed directly in the repository
-(uploaded to \texttt{main} and included in this branch).
-No manual download is required for that figure.
-
-\subsection*{A.2 Images that must be downloaded manually}
-
-Place the following image files in a \texttt{figures/} subdirectory next to
-\texttt{report.tex} before compiling (right-click each link $\to$ Save As):
+All figure files are committed directly in the \texttt{results/} directory
+of the repository.  No manual download is required.
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-\textbf{File name} & \textbf{Source (GitHub asset URL)}\\
+\textbf{File path in repo} & \textbf{Used in}\\
 \midrule
-\texttt{figures/noise\_scale\_1.png}
-  & \href{https://github.com/user-attachments/assets/515a1d51-60cb-4837-b0a9-e4c277154d41}{\texttt{asset/515a1d51\,\ldots}}\\
-\texttt{figures/noise\_scale\_2.png}
-  & \href{https://github.com/user-attachments/assets/18dd962e-2499-4809-8e10-81b72f3c69fc}{\texttt{asset/18dd962e\,\ldots}}\\
-\texttt{figures/noise\_scale\_8.png}
-  & \href{https://github.com/user-attachments/assets/2d13010c-be77-40e6-8ce9-97dec1b8716f}{\texttt{asset/2d13010c\,\ldots}}\\
-\texttt{figures/noise\_scale\_12.png}
-  & \href{https://github.com/user-attachments/assets/37800d28-801e-4e69-9b0d-4b9ee5f11ebb}{\texttt{asset/37800d28\,\ldots}}\\
-\texttt{figures/cosine\_T200\_ddpm\_samples.png}
-  & \href{https://github.com/user-attachments/assets/3a8a0063-e9fd-4829-962b-f7a99a376c1e}{\texttt{asset/3a8a0063\,\ldots}}\\
-\texttt{figures/cosine\_T200\_ddim\_samples.png}
-  & \href{https://github.com/user-attachments/assets/9ee43e87-b941-4c35-974f-dfa47756f12d}{\texttt{asset/9ee43e87\,\ldots}}\\
-\texttt{figures/cosine\_T1000\_ddim\_samples.png}
-  & \href{https://github.com/user-attachments/assets/fdf0fce7-8665-4197-a546-f34077f50d0f}{\texttt{asset/fdf0fce7\,\ldots}}\\
+\texttt{results/comparison\_chart.png}         & Figure~\ref{fig:comparison}\\
+\texttt{results/cosine\_T200\_ddpm\_samples.png}  & Figure~\ref{fig:cosine_T200_ddpm}\\
+\texttt{results/cosine\_T200\_ddim\_samples.png}  & Figure~\ref{fig:cosine_T200_ddim}\\
+\texttt{results/cosine\_T1000\_ddim\_samples.png} & Figure~\ref{fig:cosine_T1000_ddim}\\
+\texttt{results/latent\_scale\_1\_samples.png}   & Figure~\ref{fig:noise_scales}\\
+\texttt{results/latent\_scale\_2\_samples.png}   & Figure~\ref{fig:noise_scales}\\
+\texttt{results/latent\_scale\_3\_samples.png}   & Figure~\ref{fig:noise_scales}\\
+\texttt{results/latent\_scale\_5\_samples.png}   & Figure~\ref{fig:noise_scales}\\
+\texttt{results/latent\_scale\_8\_samples.png}   & Figure~\ref{fig:noise_scales}\\
+\texttt{results/latent\_scale\_12\_samples.png}  & Figure~\ref{fig:noise_scales}\\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\subsection*{A.3 Compilation}
+\subsection*{A.2 Compilation}
 
 Compile with \texttt{pdflatex} (two passes for the table of contents):
 
 \begin{verbatim}
-mkdir figures
-# download the 7 images above into figures/ using the names in the table
 pdflatex report.tex
 pdflatex report.tex   # second pass for ToC and cross-references
 \end{verbatim}
