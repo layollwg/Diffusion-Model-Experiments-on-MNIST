@@ -15,8 +15,7 @@ Samplers
 
 import torch
 import torch.nn as nn
-import numpy as np
-from typing import Literal
+from typing import Literal, Optional, Tuple
 
 
 # ---------------------------------------------------------------------------
@@ -69,12 +68,12 @@ class DiffusionModel(nn.Module):
         model: nn.Module,
         T: int = 1000,
         schedule: Literal["linear", "cosine", "quadratic"] = "linear",
-        device: torch.device | str = "cpu",
+        device: Optional[str] = None,
     ):
         super().__init__()
         self.model = model
         self.T = T
-        self.device = torch.device(device)
+        self.device = torch.device(device if device is not None else "cpu")
 
         # ----- precompute schedule tensors -----
         betas = SCHEDULE_REGISTRY[schedule](T).to(self.device)

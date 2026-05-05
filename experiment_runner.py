@@ -24,7 +24,9 @@ python experiment_runner.py [--epochs N] [--n_samples M] [--device cuda]
 import argparse
 import json
 import os
+import shutil
 import time
+from typing import List, Dict
 
 import torch
 import matplotlib
@@ -34,7 +36,7 @@ import numpy as np
 
 from model import UNet
 from diffusion import DiffusionModel
-from train import get_mnist_loader, train
+from train import train
 from evaluate import compute_is, compute_fid, get_feature_extractor, load_real_images
 
 
@@ -100,7 +102,9 @@ def generate_samples(
 
 def save_sample_grid(images: torch.Tensor, path: str, nrow: int = 8, title: str = ""):
     """Save a grid of sample images."""
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
     images = images.cpu().float()
     images = (images.clamp(-1, 1) + 1) / 2   # → [0, 1]
     n = min(len(images), nrow * nrow)
@@ -120,7 +124,7 @@ def save_sample_grid(images: torch.Tensor, path: str, nrow: int = 8, title: str 
     plt.close()
 
 
-def save_results_table(results: list[dict], path: str):
+def save_results_table(results: List[Dict], path: str):
     """Save a bar chart comparing IS and FID across experiments."""
     names = [r["name"] for r in results]
     is_means = [r["IS_mean"] for r in results]
@@ -130,12 +134,14 @@ def save_results_table(results: list[dict], path: str):
     x = np.arange(len(names))
 
     ax1.bar(x, is_means, color="steelblue")
-    ax1.set_xticks(x); ax1.set_xticklabels(names, rotation=45, ha="right", fontsize=8)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(names, rotation=45, ha="right", fontsize=8)
     ax1.set_ylabel("Inception Score (↑)")
     ax1.set_title("IS across experiments")
 
     ax2.bar(x, fids, color="tomato")
-    ax2.set_xticks(x); ax2.set_xticklabels(names, rotation=45, ha="right", fontsize=8)
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(names, rotation=45, ha="right", fontsize=8)
     ax2.set_ylabel("FID (↓)")
     ax2.set_title("FID across experiments")
 
@@ -162,6 +168,7 @@ def run_all(
         device = "cuda" if torch.cuda.is_available() else "cpu"
     device = torch.device(device)
     os.makedirs(results_dir, exist_ok=True)
+    os.makedirs(ckpt_dir, exist_ok=True)
 
     # Pre-load real images for FID
     print("[runner] Loading real MNIST images for FID …")
@@ -182,35 +189,27 @@ def run_all(
         print(f"[runner] Experiment: {name}")
         print(f"{'='*60}")
 
-        best_ckpt = os.path.join(ckpt_dir, f"{name}_best.pt")
+        # -----------------------------------------------------------------
+        # DDPM and DDIM share one trained model per (schedule, T) pair.
+        # Checkpoint filename: {schedule}_T{T}_best.pt
+        # -----------------------------------------------------------------
+        shared_ckpt = os.path.join(ckpt_dir, f"{schedule}_T{T}_best.pt")
 
-        # ---- train (skip if checkpoint already exists) ----
-        if not os.path.exists(best_ckpt):
-            # Share weights between DDPM and DDIM experiments with same (schedule, T)
-            base_name = f"{schedule}_T{T}"
-            shared_best = os.path.join(ckpt_dir, f"{base_name}_best.pt")
-            if os.path.exists(shared_best):
-                print(f"  Reusing checkpoint from {shared_best}")
-                import shutil
-                shutil.copy(shared_best, best_ckpt)
-            else:
-                train(
-                    schedule=schedule,
-                    T=T,
-                    epochs=epochs,
-                    run_name=name,
-                    device=str(device),
-                    ckpt_dir=ckpt_dir,
-                )
-                # also save as shared checkpoint for the other sampler variant
-                if os.path.exists(best_ckpt) and not os.path.exists(shared_best):
-                    import shutil
-                    shutil.copy(best_ckpt, shared_best)
+        if not os.path.exists(shared_ckpt):
+            print(f"  Training model for schedule={schedule}, T={T} …")
+            train(
+                schedule=schedule,
+                T=T,
+                epochs=epochs,
+                run_name=f"{schedule}_T{T}",
+                device=str(device),
+                ckpt_dir=ckpt_dir,
+            )
         else:
-            print(f"  Checkpoint found, skipping training.")
+            print(f"  Checkpoint found ({shared_ckpt}), skipping training.")
 
-        # ---- load model ----
-        diffusion = load_diffusion(best_ckpt, device)
+        # ---- load shared model ----
+        diffusion = load_diffusion(shared_ckpt, device)
 
         # ---- generate samples ----
         print(f"  Generating {n_samples} samples with {sampler.upper()} …")

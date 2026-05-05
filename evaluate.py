@@ -18,9 +18,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from typing import Optional, Tuple
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 
 # ---------------------------------------------------------------------------
@@ -53,7 +53,7 @@ class MNISTClassifier(nn.Module):
         return logits
 
 
-_CLASSIFIER_CACHE: MNISTClassifier | None = None
+_CLASSIFIER_CACHE: Optional[MNISTClassifier] = None
 _CLASSIFIER_CKPT = os.path.join(os.path.dirname(__file__), "checkpoints", "mnist_cls.pt")
 
 
@@ -137,7 +137,7 @@ def compute_is(
     classifier: MNISTClassifier,
     splits: int = 10,
     batch_size: int = 256,
-) -> tuple[float, float]:
+) -> Tuple[float, float]:
     """
     Compute Inception Score (mean ± std over `splits` splits).
 

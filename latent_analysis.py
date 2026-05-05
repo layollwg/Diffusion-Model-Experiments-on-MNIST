@@ -67,7 +67,7 @@ def run_latent_analysis(
         base_noise = torch.randn(n_samples, 1, 28, 28)
         # Normalise to unit norm per sample, then scale to desired norm
         norms = base_noise.view(n_samples, -1).norm(dim=1, keepdim=True)
-        unit_noise = base_noise.view(n_samples, -1) / norms
+        unit_noise = base_noise.view(n_samples, -1) / (norms + 1e-8)
         # Scale: ||x|| ~ scale * sqrt(28*28) to match the expected norm
         expected_norm = scale * (28 * 28) ** 0.5
         scaled_noise = (unit_noise * expected_norm).view(n_samples, 1, 28, 28)
@@ -145,8 +145,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--ckpt",
-        default="./checkpoints/cosine_T1000_ddim_best.pt",
-        help="Path to the best model checkpoint",
+        default="./checkpoints/cosine_T1000_best.pt",
+        help="Path to the best model checkpoint (e.g. cosine_T1000_best.pt)",
     )
     parser.add_argument("--n_samples", type=int, default=500)
     parser.add_argument("--batch_size", type=int, default=128)
