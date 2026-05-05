@@ -14,6 +14,7 @@ from evaluate import compute_is, compute_fid, get_feature_extractor
 """
 
 import os
+import platform
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -21,6 +22,10 @@ import numpy as np
 from typing import Optional, Tuple
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
+
+# On Windows, multiprocessing uses "spawn" which can conflict with DataLoader
+# workers; use 0 workers to avoid the issue.
+_NUM_WORKERS = 0 if platform.system() == "Windows" else 2
 
 
 # ---------------------------------------------------------------------------
@@ -79,7 +84,7 @@ def get_feature_extractor(device: torch.device) -> MNISTClassifier:
     ])
     loader = DataLoader(
         datasets.MNIST("./data", train=True, download=True, transform=transform),
-        batch_size=256, shuffle=True, num_workers=2,
+        batch_size=256, shuffle=True, num_workers=_NUM_WORKERS,
     )
     opt = torch.optim.Adam(model.parameters(), lr=1e-3)
     for epoch in range(5):

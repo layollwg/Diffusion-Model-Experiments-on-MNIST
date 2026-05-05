@@ -8,6 +8,7 @@ python train.py --schedule linear --T 1000 --epochs 30 --run_name linear_T1000
 
 import argparse
 import os
+import platform
 import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
@@ -15,6 +16,10 @@ from tqdm import tqdm
 
 from model import UNet
 from diffusion import DiffusionModel
+
+# On Windows, multiprocessing uses "spawn" which can conflict with DataLoader
+# workers; use 0 workers to avoid the issue.
+_NUM_WORKERS = 0 if platform.system() == "Windows" else 2
 
 
 # ---------------------------------------------------------------------------
@@ -28,7 +33,7 @@ def get_mnist_loader(batch_size: int = 128, train: bool = True, data_root: str =
     ])
     dataset = datasets.MNIST(data_root, train=train, download=True, transform=transform)
     return DataLoader(dataset, batch_size=batch_size, shuffle=train,
-                      num_workers=2, pin_memory=True, drop_last=True)
+                      num_workers=_NUM_WORKERS, pin_memory=True, drop_last=True)
 
 
 # ---------------------------------------------------------------------------
