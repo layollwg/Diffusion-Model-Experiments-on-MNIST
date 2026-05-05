@@ -218,8 +218,8 @@ cosine\_T1000\_ddim & cosine & 1000 & DDIM & 8.9 & $-$2.05 & short \\
 
 \begin{figure}[H]
   \centering
-  % ── Save the comparison bar-chart image as figures/comparison_chart.png
-  \includegraphics[width=0.92\textwidth]{figures/comparison_chart.png}
+  % ── Already in the repo at results/comparison_chart.png
+  \includegraphics[width=0.92\textwidth]{results/comparison_chart.png}
   \caption{IS (top) and FID (bottom) for all eight configurations.
     A clear two-tier structure is visible: the two \texttt{linear\_T200}
     configurations lag behind all others in IS and have worse (more positive)
@@ -472,10 +472,16 @@ cosine\_T1000\_ddim & cosine/1000 & 8.9 & $-$2.05
 \appendix
 \section*{Appendix: How to Compile This Report}
 
-\subsection*{A.1 Required Images}
+\subsection*{A.1 Images already in the repository}
+
+\texttt{results/comparison\_chart.png} is committed directly in the repository
+(uploaded to \texttt{main} and included in this branch).
+No manual download is required for that figure.
+
+\subsection*{A.2 Images that must be downloaded manually}
 
 Place the following image files in a \texttt{figures/} subdirectory next to
-\texttt{report.tex} before compiling:
+\texttt{report.tex} before compiling (right-click each link $\to$ Save As):
 
 \begin{center}
 \begin{tabular}{ll}
@@ -490,8 +496,6 @@ Place the following image files in a \texttt{figures/} subdirectory next to
   & \href{https://github.com/user-attachments/assets/2d13010c-be77-40e6-8ce9-97dec1b8716f}{\texttt{asset/2d13010c\,\ldots}}\\
 \texttt{figures/noise\_scale\_12.png}
   & \href{https://github.com/user-attachments/assets/37800d28-801e-4e69-9b0d-4b9ee5f11ebb}{\texttt{asset/37800d28\,\ldots}}\\
-\texttt{figures/comparison\_chart.png}
-  & \href{https://github.com/user-attachments/assets/8cef4286-f72e-4e32-89b3-2c5711da5211}{\texttt{asset/8cef4286\,\ldots}}\\
 \texttt{figures/cosine\_T200\_ddpm\_samples.png}
   & \href{https://github.com/user-attachments/assets/3a8a0063-e9fd-4829-962b-f7a99a376c1e}{\texttt{asset/3a8a0063\,\ldots}}\\
 \texttt{figures/cosine\_T200\_ddim\_samples.png}
@@ -502,13 +506,13 @@ Place the following image files in a \texttt{figures/} subdirectory next to
 \end{tabular}
 \end{center}
 
-\subsection*{A.2 Compilation}
+\subsection*{A.3 Compilation}
 
 Compile with \texttt{pdflatex} (two passes for the table of contents):
 
 \begin{verbatim}
 mkdir figures
-# download the eight images above into figures/ with the names listed above
+# download the 7 images above into figures/ using the names in the table
 pdflatex report.tex
 pdflatex report.tex   # second pass for ToC and cross-references
 \end{verbatim}
