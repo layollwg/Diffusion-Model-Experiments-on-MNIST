@@ -252,12 +252,31 @@ def run_all(
     print(f"\n[runner] Results saved → {json_path}")
 
     # ---- print summary table ----
-    print("\n{:<30} {:>10} {:>10} {:>10} {:>12}".format(
-        "Experiment", "IS↑", "IS_std", "FID↓", "Gen Time(s)"))
-    print("-" * 75)
+    col_w = (32, 9, 9, 12, 13)  # inner widths (including 1-space padding each side)
+    h_sep = "─" * col_w[0]
+    def _row(vals, widths, sep="│"):
+        cells = []
+        for v, w in zip(vals, widths):
+            cells.append(f" {v:<{w-2}} " if isinstance(v, str) and vals.index(v) == 0
+                         else f" {v:>{w-2}} ")
+        return sep + sep.join(cells) + sep
+    def _hline(left, mid, right):
+        return left + mid.join("─" * w for w in col_w) + right
+
+    best_is  = max(r["IS_mean"] for r in all_results)
+    best_fid = max(r["FID"]     for r in all_results)   # higher (less negative) is better
+
+    print()
+    print(_hline("┌", "┬", "┐"))
+    print(_row(["Experiment", "IS↑", "IS_std", "FID↓", "Gen Time(s)"], col_w))
+    print(_hline("├", "┼", "┤"))
     for r in all_results:
-        print("{:<30} {:>10.3f} {:>10.3f} {:>10.3f} {:>12.1f}".format(
-            r["name"], r["IS_mean"], r["IS_std"], r["FID"], r["gen_time_s"]))
+        is_str  = f"{'★' if r['IS_mean'] == best_is  else ''}{r['IS_mean']:.3f}"
+        fid_str = f"{'★' if r['FID']     == best_fid else ''}{r['FID']:.3f}"
+        print(_row([r["name"], is_str, f"{r['IS_std']:.3f}",
+                    fid_str, f"{r['gen_time_s']:.1f}"], col_w))
+    print(_hline("└", "┴", "┘"))
+    print("  ★ = best in column  │  IS↑ higher is better  │  FID↓ less negative is better\n")
 
     # ---- save comparison chart ----
     chart_path = os.path.join(results_dir, "comparison_chart.png")
