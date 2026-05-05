@@ -1,0 +1,82 @@
+[
+  {
+    "name": "linear_T200_ddpm",
+    "schedule": "linear",
+    "T": 200,
+    "sampler": "ddpm",
+    "IS_mean": 7.0049,
+    "IS_std": 0.2976,
+    "FID": -2725.3834,
+    "gen_time_s": 72.2
+  },
+  {
+    "name": "linear_T200_ddim",
+    "schedule": "linear",
+    "T": 200,
+    "sampler": "ddim",
+    "IS_mean": 6.1521,
+    "IS_std": 0.3196,
+    "FID": -2504.7869,
+    "gen_time_s": 17.93
+  },
+  {
+    "name": "linear_T1000_ddpm",
+    "schedule": "linear",
+    "T": 1000,
+    "sampler": "ddpm",
+    "IS_mean": 9.0005,
+    "IS_std": 0.2052,
+    "FID": -2125.388,
+    "gen_time_s": 355.86
+  },
+  {
+    "name": "linear_T1000_ddim",
+    "schedule": "linear",
+    "T": 1000,
+    "sampler": "ddim",
+    "IS_mean": 8.7443,
+    "IS_std": 0.2622,
+    "FID": -2122.7659,
+    "gen_time_s": 17.83
+  },
+  {
+    "name": "cosine_T200_ddpm",
+    "schedule": "cosine",
+    "T": 200,
+    "sampler": "ddpm",
+    "IS_mean": 8.906,
+    "IS_std": 0.3129,
+    "FID": -2205.0469,
+    "gen_time_s": 71.3
+  },
+  {
+    "name": "cosine_T200_ddim",
+    "schedule": "cosine",
+    "T": 200,
+    "sampler": "ddim",
+    "IS_mean": 8.9108,
+    "IS_std": 0.1737,
+    "FID": -2152.2403,
+    "gen_time_s": 17.86
+  },
+  {
+    "name": "cosine_T1000_ddpm",
+    "schedule": "cosine",
+    "T": 1000,
+    "sampler": "ddpm",
+    "IS_mean": 9.1416,
+    "IS_std": 0.1583,
+    "FID": -2193.7106,
+    "gen_time_s": 356.13
+  },
+  {
+    "name": "cosine_T1000_ddim",
+    "schedule": "cosine",
+    "T": 1000,
+    "sampler": "ddim",
+    "IS_mean": 8.8833,
+    "IS_std": 0.2978,
+    "FID": -2100.8746,
+    "gen_time_s": 17.92
+  }
+]
