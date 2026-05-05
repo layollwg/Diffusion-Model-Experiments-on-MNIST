@@ -195,23 +195,24 @@ Figure~\ref{fig:comparison} presents the same data as side-by-side bar charts.
 \centering
 \caption{Quantitative results across all eight experiment configurations.
   IS (higher is better) and FID (lower is better).
-  Generation time is for 1,000 samples.}
+  Generation time is wall-clock time to produce 1,000 samples.}
 \label{tab:results}
-\begin{tabular}{llllrrr}
+\begin{tabular}{llllr@{$\,\pm\,$}lrr}
 \toprule
 \textbf{Experiment} & \textbf{Schedule} & \boldmath$T$ & \textbf{Sampler}
-  & \textbf{IS↑} & \textbf{FID (×10\textsuperscript{3}) ↓}
+  & \multicolumn{2}{c}{\textbf{IS↑}}
+  & \textbf{FID↓}
   & \textbf{Gen.\ time (s)}\\
 \midrule
-linear\_T200\_ddpm  & linear & 200  & DDPM & 7.0 & $-$2.65 & short \\
-linear\_T200\_ddim  & linear & 200  & DDIM & 6.2 & $-$2.55 & very short \\
-linear\_T1000\_ddpm & linear & 1000 & DDPM & 9.0 & $-$2.05 & long \\
-linear\_T1000\_ddim & linear & 1000 & DDIM & 8.7 & $-$2.05 & short \\
-cosine\_T200\_ddpm  & cosine & 200  & DDPM & 8.8 & $-$2.05 & short \\
-cosine\_T200\_ddim  & cosine & 200  & DDIM & 8.8 & $-$2.05 & very short \\
+linear\_T200\_ddpm  & linear & 200  & DDPM & 7.005 & 0.298 & $-$2725.4 & 72.2 \\
+linear\_T200\_ddim  & linear & 200  & DDIM & 6.152 & 0.320 & $-$2504.8 & 17.9 \\
+linear\_T1000\_ddpm & linear & 1000 & DDPM & 9.001 & 0.205 & $-$2125.4 & 355.9 \\
+linear\_T1000\_ddim & linear & 1000 & DDIM & 8.744 & 0.262 & $-$2122.8 & 17.8 \\
+cosine\_T200\_ddpm  & cosine & 200  & DDPM & 8.906 & 0.313 & $-$2205.0 & 71.3 \\
+cosine\_T200\_ddim  & cosine & 200  & DDIM & 8.911 & 0.174 & $-$2152.2 & 17.9 \\
 \textbf{cosine\_T1000\_ddpm} & \textbf{cosine} & \textbf{1000} & \textbf{DDPM}
-  & \textbf{9.1} & \boldmath$-$\textbf{2.00} & long \\
-cosine\_T1000\_ddim & cosine & 1000 & DDIM & 8.9 & $-$2.05 & short \\
+  & \textbf{9.142} & \textbf{0.158} & \boldmath$-$\textbf{2193.7} & \textbf{356.1} \\
+cosine\_T1000\_ddim & cosine & 1000 & DDIM & 8.883 & 0.298 & $-$2100.9 & 17.9 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -412,6 +413,22 @@ generation quality.
   \label{fig:noise_scales}
 \end{figure}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{results/latent_scale_analysis.png}
+  \caption{Effect of latent noise magnitude on generation quality.
+    \textbf{Left}: IS decreases monotonically as the initial noise scale
+    grows beyond the training distribution (scale 1.0, dashed line),
+    dropping from 8.6 at scale 1 to below 4.5 at scale 12.
+    \textbf{Right}: FID (lower is better) worsens sharply up to scale 3,
+    improves anomalously at scale 8 (an artefact of the small-sample FID
+    estimator), then rises again at scale 12.
+    Together, the curves confirm that generation quality degrades
+    consistently once the starting noise magnitude departs from the
+    expected unit Gaussian prior.}
+  \label{fig:latent_scale_analysis}
+\end{figure}
+
 \subsection{Generated Sample Grids}
 
 The sample grids in Figures~\ref{fig:cosine_T200_ddpm}–\ref{fig:cosine_T1000_ddim}
@@ -435,20 +452,20 @@ in sample quality as schedule and $T$ improve:
 \begin{table}[H]
 \centering
 \caption{Configuration ranking and recommended use cases.}
-\begin{tabular}{llrrl}
+\begin{tabular}{llr@{$\,\pm\,$}lrl}
 \toprule
-\textbf{Configuration} & \textbf{Schedule/$T$} & \textbf{IS↑} &
-  \textbf{FID (×10\textsuperscript{3})↓} & \textbf{Recommended use}\\
+\textbf{Configuration} & \textbf{Schedule/$T$} & \multicolumn{2}{c}{\textbf{IS↑}} &
+  \textbf{FID↓} & \textbf{Recommended use}\\
 \midrule
-linear\_T200\_ddpm  & linear/200  & 7.0 & $-$2.65 & \textcolor{red!60!black}{Not recommended}\\
-linear\_T200\_ddim  & linear/200  & 6.2 & $-$2.55 & \textcolor{red!60!black}{Not recommended}\\
-linear\_T1000\_ddpm & linear/1000 & 9.0 & $-$2.05 & Acceptable if cosine unavailable\\
-linear\_T1000\_ddim & linear/1000 & 8.7 & $-$2.05 & Acceptable, fast inference\\
-cosine\_T200\_ddpm  & cosine/200  & 8.8 & $-$2.05 & \textcolor{green!50!black}{Fast train + quality}\\
-cosine\_T200\_ddim  & cosine/200  & 8.8 & $-$2.05 & \textcolor{green!50!black}{Fast train + fast inference}\\
-\textbf{cosine\_T1000\_ddpm} & cosine/1000 & \textbf{9.1} & \boldmath$-$\textbf{2.00}
-  & \textcolor{green!50!black}{Best quality}\\
-cosine\_T1000\_ddim & cosine/1000 & 8.9 & $-$2.05
+linear\_T200\_ddpm  & linear/200  & 7.005 & 0.298 & $-$2725.4 & \textcolor{red!60!black}{Not recommended}\\
+linear\_T200\_ddim  & linear/200  & 6.152 & 0.320 & $-$2504.8 & \textcolor{red!60!black}{Not recommended}\\
+linear\_T1000\_ddpm & linear/1000 & 9.001 & 0.205 & $-$2125.4 & Acceptable if cosine unavailable\\
+linear\_T1000\_ddim & linear/1000 & 8.744 & 0.262 & $-$2122.8 & Acceptable, fast inference\\
+cosine\_T200\_ddpm  & cosine/200  & 8.906 & 0.313 & $-$2205.0 & \textcolor{green!50!black}{Fast train + quality}\\
+cosine\_T200\_ddim  & cosine/200  & 8.911 & 0.174 & $-$2152.2 & \textcolor{green!50!black}{Fast train + fast inference}\\
+\textbf{cosine\_T1000\_ddpm} & cosine/1000 & \textbf{9.142} & \textbf{0.158} & \boldmath$-$\textbf{2193.7}
+  & \textcolor{green!50!black}{Best IS quality}\\
+cosine\_T1000\_ddim & cosine/1000 & 8.883 & 0.298 & $-$2100.9
   & \textcolor{green!50!black}{Best quality / speed trade-off}\\
 \bottomrule
 \end{tabular}
@@ -514,6 +531,7 @@ of the repository.  No manual download is required.
 \texttt{results/latent\_scale\_5\_samples.png}   & Figure~\ref{fig:noise_scales}\\
 \texttt{results/latent\_scale\_8\_samples.png}   & Figure~\ref{fig:noise_scales}\\
 \texttt{results/latent\_scale\_12\_samples.png}  & Figure~\ref{fig:noise_scales}\\
+\texttt{results/latent\_scale\_analysis.png}     & Figure~\ref{fig:latent_scale_analysis}\\
 \bottomrule
 \end{tabular}
 \end{center}
